@@ -2,8 +2,6 @@ import domEvents from './dom-events-to-record'
 import pptrActions from './pptr-actions'
 import Block from './Block'
 
-export const frameId = 0;
-
 export const defaults = {
   wrapAsync: true,
   headless: true,
@@ -21,18 +19,14 @@ export default class GACodeGenerator {
     this._frameId = 0
     this._allFrames = {}
     this._screenshotCounter = 1
+    this.selectorsVals = {};
 
     this._hasNavigation = false
   }
-
   generate (events) {
     return this._parseEvents(events);
   }
-
   _parseEvents (events) {
-    
-    // we need to keep a handle on what frames events originate from
-    this._setFrames(frameId);
 
     console.debug(`generating code for ${events ? events.length : 0} events`)
     let result = ''
@@ -40,17 +34,29 @@ export default class GACodeGenerator {
     if (!events) return result
 
     for (let i = 0; i < events.length; i++) {
-      const { action, selector, value, href } = events[i];
+      const { action, selector, value, href, keyCode, tagName, frameId, frameUrl } = events[i]
+
+      // we need to keep a handle on what frames events originate from
+      this._setFrames(frameId, frameUrl)
+
       switch (action) {
+        case 'keydown':
+          this._blocks.push(this._handleKeyDown(selector, value, keyCode));
+          break;
         case 'click':
           this._blocks.push(this._handleClick(selector, events))
-          break
+          break;
+        case 'change':
+          if (tagName === 'SELECT') {
+            this._blocks.push(this._handleChange(selector, value))
+          }
+          break;
         case pptrActions.GOTO:
           this._blocks.push(this._handleGoto(href, frameId))
-          break
+          break;
         case pptrActions.SCREENSHOT:
           this._blocks.push(this._handleScreenshot(value))
-          break
+          break;
       }
     }
 
@@ -69,7 +75,6 @@ export default class GACodeGenerator {
 
     return result
   }
-
   _postProcess () {
     // when events are recorded from different frames, we want to add a frame setter near the code that uses that frame
     if (Object.keys(this._allFrames).length > 0) {
@@ -80,23 +85,20 @@ export default class GACodeGenerator {
       this._postProcessAddBlankLines()
     }
   }
-
   _handleKeyDown (selector, value) {
     const block = new Block(this._frameId)
-    block.addLine({ type: domEvents.KEYDOWN, value: `await ${this._frame}.type('${selector}', '${value}')` });
+    block.addLine({ type: domEvents.KEYDOWN, value: `fillField '${selector}' '${value}'` });
     return block
   }
-
   _handleClick (selector) {
     return new Block(this._frameId, { type: domEvents.CLICK, value: `click '${selector}'` });
   }
   _handleChange (selector, value) {
-    return new Block(this._frameId, { type: domEvents.CHANGE, value: `await ${this._frame}.select('${selector}', '${value}')` })
+    return new Block(this._frameId, { type: domEvents.CHANGE, value: `select '${selector}' '${value}'` })
   }
   _handleGoto (href) {
     return new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` })
   }
-
   _handleScreenshot (options) {
     let block
 
@@ -152,8 +154,14 @@ export default class GACodeGenerator {
     }
   }
 
-  _setFrames (frameId) {
-      this._frameId = frameId;
-      this._frame = 'page';
+  _setFrames (frameId, frameUrl) {
+    if (frameId && frameId !== 0) {
+      this._frameId = frameId
+      this._frame = `frame_${frameId}`
+      this._allFrames[frameId] = frameUrl
+    } else {
+      this._frameId = 0
+      this._frame = 'page'
+    }
   }
 }

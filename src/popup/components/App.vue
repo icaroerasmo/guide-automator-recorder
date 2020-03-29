@@ -43,7 +43,7 @@
 
 <script>
   import { version } from '../../../package.json'
-  import CodeGenerator from '../../code-generator/CodeGenerator'
+  import GACodeGenerator from '../../code-generator/GACodeGenerator'
   import RecordingTab from './RecordingTab.vue'
   import ResultsTab from './ResultsTab.vue'
   import HelpTab from './HelpTab.vue'
@@ -124,7 +124,7 @@ export default {
           this.recording = recording
           const codeOptions = options ? options.code : {}
 
-          const codeGen = new CodeGenerator(codeOptions)
+          const codeGen = new GACodeGenerator(codeOptions)
           this.code = codeGen.generate(this.recording)
           this.showResultsTab = true
           this.storeState()

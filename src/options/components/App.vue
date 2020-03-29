@@ -85,7 +85,7 @@
 </template>
 
 <script>
-  import { defaults as code } from '../../code-generator/CodeGenerator'
+  import { defaults as code } from '../../code-generator/GACodeGenerator'
 
   const defaults = {
     code,
