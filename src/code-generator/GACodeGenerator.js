@@ -41,26 +41,16 @@ export default class GACodeGenerator {
 
       switch (action) {
         case 'keydown':
-          const block = this._handleKeyDown(selector, value, keyCode);
-          const previousBlock = this._blocks[this._blocks.length-1].getLines()[0];
-          if(this._blocks.length > 0 &&
-            previousBlock.type === domEvents.KEYDOWN &&
-            previousBlock.value.includes(selector)){
-            this._blocks[this._blocks.length-1] = block;
-          } else {
-            this._blocks.push(block);
-          }
+          this._handleKeyDown(selector, value, keyCode);
           break;
         case 'click':
-          this._blocks.push(this._handleClick(selector, events))
+          this._handleClick(selector, events);
           break;
         case 'change':
-          if (tagName === 'SELECT') {
-            this._blocks.push(this._handleChange(selector, value))
-          }
+          this._handleChange(selector, value, tagName);
           break;
         case pptrActions.GOTO:
-          this._blocks.push(this._handleGoto(href, frameId))
+          this._handleGoto(href, frameId);
           break;
         case pptrActions.SCREENSHOT:
           this._blocks.push(this._handleScreenshot(value))
@@ -89,16 +79,34 @@ export default class GACodeGenerator {
     }
   }
   _handleKeyDown (selector, value) {
-    return new Block(this._frameId, { type: domEvents.KEYDOWN, value: `fill-field '${selector}' '${value}'` });
+    const block = new Block(
+      this._frameId,
+      {
+        type: domEvents.KEYDOWN,
+        value: `fill-field '${selector}' '${value}'`
+      }
+    );
+    const previousBlock = this._blocks[
+        this._blocks.length-1
+      ].getLines()[0];
+    if(this._blocks.length > 0 &&
+      previousBlock.type === domEvents.KEYDOWN &&
+      previousBlock.value.includes(selector)){
+      this._blocks[this._blocks.length-1] = block;
+    } else {
+      this._blocks.push(block);
+    }
   }
   _handleClick (selector) {
-    return new Block(this._frameId, { type: domEvents.CLICK, value: `click '${selector}'` });
+    this._blocks.push(new Block(this._frameId, { type: domEvents.CLICK, value: `click '${selector}'` }));
   }
-  _handleChange (selector, value) {
-    return new Block(this._frameId, { type: domEvents.CHANGE, value: `select '${selector}' '${value}'` })
+  _handleChange (selector, value, tagName) {
+    if (tagName === 'SELECT') {
+      this._blocks.push(new Block(this._frameId, { type: domEvents.CHANGE, value: `select '${selector}' '${value}'` }));
+    }
   }
   _handleGoto (href) {
-    return new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` })
+    this._blocks.push(new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` }));
   }
   _handleScreenshot (options) {
     let block
@@ -119,15 +127,7 @@ export default class GACodeGenerator {
     }
 
     this._screenshotCounter++
-    return block
-  }
-
-  _handleWaitForNavigation () {
-    const block = new Block(this._frameId)
-    if (this._options.waitForNavigation) {
-      block.addLine({type: pptrActions.NAVIGATION, value: `await navigationPromise`})
-    }
-    return block
+    this._blocks.push(block);
   }
 
   _postProcessAddBlankLines () {
