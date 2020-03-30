@@ -79,22 +79,24 @@ export default class GACodeGenerator {
     }
   }
   _handleKeyDown (selector, value) {
-    const block = new Block(
-      this._frameId,
-      {
-        type: domEvents.KEYDOWN,
-        value: `fill-field '${selector}' '${value}'`
+    if(value){
+      const block = new Block(
+        this._frameId,
+        {
+          type: domEvents.KEYDOWN,
+          value: `fill-field '${selector}' '${value}'`
+        }
+      );
+      const previousBlock = this._blocks[
+          this._blocks.length-1
+        ].getLines()[0];
+      if(this._blocks.length > 0 &&
+        previousBlock.type === domEvents.KEYDOWN &&
+        previousBlock.value.includes(selector)){
+        this._blocks[this._blocks.length-1] = block;
+      } else {
+        this._blocks.push(block);
       }
-    );
-    const previousBlock = this._blocks[
-        this._blocks.length-1
-      ].getLines()[0];
-    if(this._blocks.length > 0 &&
-      previousBlock.type === domEvents.KEYDOWN &&
-      previousBlock.value.includes(selector)){
-      this._blocks[this._blocks.length-1] = block;
-    } else {
-      this._blocks.push(block);
     }
   }
   _handleClick (selector) {
