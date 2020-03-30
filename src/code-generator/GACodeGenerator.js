@@ -84,11 +84,6 @@ export default class GACodeGenerator {
     return result
   }
   _postProcess () {
-    // when events are recorded from different frames, we want to add a frame setter near the code that uses that frame
-    if (Object.keys(this._allFrames).length > 0) {
-      this._postProcessSetFrames()
-    }
-
     if (this._options.blankLinesBetweenBlocks && this._blocks.length > 0) {
       this._postProcessAddBlankLines()
     }
@@ -133,21 +128,6 @@ export default class GACodeGenerator {
       block.addLine({type: pptrActions.NAVIGATION, value: `await navigationPromise`})
     }
     return block
-  }
-
-  _postProcessSetFrames () {
-    for (let [i, block] of this._blocks.entries()) {
-      const lines = block.getLines()
-      for (let line of lines) {
-        if (line.frameId && Object.keys(this._allFrames).includes(line.frameId.toString())) {
-          const declaration = `const frame_${line.frameId} = frames.find(f => f.url() === '${this._allFrames[line.frameId]}')`
-          this._blocks[i].addLineToTop(({ type: pptrActions.FRAME_SET, value: declaration }))
-          this._blocks[i].addLineToTop({ type: pptrActions.FRAME_SET, value: 'let frames = await page.frames()' })
-          delete this._allFrames[line.frameId]
-          break
-        }
-      }
-    }
   }
 
   _postProcessAddBlankLines () {
