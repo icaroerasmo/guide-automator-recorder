@@ -2,7 +2,7 @@
   <div class="options">
     <div class="container">
       <div class="header">
-        Puppeteer Recorder Options
+        Guide Automator Recorder Options
         <small class="saving-badge text-muted" v-show="saving">
           Saving...
         </small>

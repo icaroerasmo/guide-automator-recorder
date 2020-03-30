@@ -7,7 +7,7 @@ export const defaults = {
   headless: true,
   waitForNavigation: true,
   waitForSelectorOnClick: true,
-  blankLinesBetweenBlocks: true,
+  blankLinesBetweenBlocks: false,
   dataAttribute: ''
 }
 
