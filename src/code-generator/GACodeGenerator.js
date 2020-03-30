@@ -53,7 +53,7 @@ export default class GACodeGenerator {
           this._handleGoto(href, frameId);
           break;
         case pptrActions.SCREENSHOT:
-          this._blocks.push(this._handleScreenshot(value))
+          this._handleScreenshot(value);
           break;
       }
     }
