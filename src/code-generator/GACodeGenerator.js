@@ -41,7 +41,15 @@ export default class GACodeGenerator {
 
       switch (action) {
         case 'keydown':
-          this._blocks.push(this._handleKeyDown(selector, value, keyCode));
+          const block = this._handleKeyDown(selector, value, keyCode);
+          const previousBlock = this._blocks[this._blocks.length-1].getLines()[0];
+          if(this._blocks.length > 0 &&
+            previousBlock.type === domEvents.KEYDOWN &&
+            previousBlock.value.includes(selector)){
+            this._blocks[this._blocks.length-1] = block;
+          } else {
+            this._blocks.push(block);
+          }
           break;
         case 'click':
           this._blocks.push(this._handleClick(selector, events))
@@ -86,9 +94,7 @@ export default class GACodeGenerator {
     }
   }
   _handleKeyDown (selector, value) {
-    const block = new Block(this._frameId)
-    block.addLine({ type: domEvents.KEYDOWN, value: `fillField '${selector}' '${value}'` });
-    return block
+    return new Block(this._frameId, { type: domEvents.KEYDOWN, value: `fill-field '${selector}' '${value}'` });
   }
   _handleClick (selector) {
     return new Block(this._frameId, { type: domEvents.CLICK, value: `click '${selector}'` });

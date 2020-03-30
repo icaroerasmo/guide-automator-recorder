@@ -22,4 +22,8 @@ export default class Block {
   getLines () {
     return this._lines
   }
+
+  setLines(lines) {
+    this._lines = lines;
+  }
 }
