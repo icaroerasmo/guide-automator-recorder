@@ -19,7 +19,6 @@ export default class GACodeGenerator {
     this._frameId = 0
     this._allFrames = {}
     this._screenshotCounter = 1
-    this.selectorsVals = {};
 
     this._hasNavigation = false
   }
@@ -78,25 +77,19 @@ export default class GACodeGenerator {
       this._postProcessAddBlankLines()
     }
   }
-  _handleKeyDown (selector, value) {
-    if(value){
-      const block = new Block(
-        this._frameId,
-        {
-          type: domEvents.KEYDOWN,
-          value: `fill-field '${selector}' '${value}'`
-        }
-      );
-      const previousBlock = this._blocks[
-          this._blocks.length-1
-        ].getLines()[0];
-      if(this._blocks.length > 0 &&
-        previousBlock.type === domEvents.KEYDOWN &&
-        previousBlock.value.includes(selector)){
-        this._blocks[this._blocks.length-1] = block;
-      } else {
-        this._blocks.push(block);
-      }
+  _handleKeyDown (selector, value, keyCode) {
+    if(keyCode === 13){
+      // const previousBlock = this._blocks[
+      //     this._blocks.length-1
+      //   ];c
+      // if(this._blocks.length > 0 &&
+      //   previousBlock.getLines()[0].type === domEvents.CHANGE &&
+      //   previousBlock.getLines()[0].value.includes(selector)){
+      //   previousBlock.addLine({
+      //     type: domEvents.KEYDOWN,
+      //     value: `submit-form '${selector}'`
+      //   });
+      // }
     }
   }
   _handleClick (selector) {
@@ -105,6 +98,8 @@ export default class GACodeGenerator {
   _handleChange (selector, value, tagName) {
     if (tagName === 'SELECT') {
       this._blocks.push(new Block(this._frameId, { type: domEvents.CHANGE, value: `select '${selector}' '${value}'` }));
+    } else if (tagName === 'INPUT') {
+      this._blocks.push(new Block(this._frameId, { type: domEvents.CHANGE, value: `fill-field '${selector}' '${value}'` }));
     }
   }
   _handleGoto (href) {
