@@ -33,15 +33,12 @@ export default class GACodeGenerator {
     if (!events) return result
 
     for (let i = 0; i < events.length; i++) {
-      const { action, selector, value, href, keyCode, tagName, frameId, frameUrl } = events[i]
+      const { action, selector, value, href, tagName, frameId, frameUrl } = events[i]
 
       // we need to keep a handle on what frames events originate from
       this._setFrames(frameId, frameUrl)
 
       switch (action) {
-        case 'keydown':
-          this._handleKeyDown(selector, value, keyCode);
-          break;
         case 'click':
           this._handleClick(selector, events);
           break;
@@ -52,7 +49,10 @@ export default class GACodeGenerator {
           this._handleGoto(href, frameId);
           break;
         case pptrActions.SCREENSHOT:
-          this._handleScreenshot(value);
+          this._handleScreenshot(selector);
+          break;
+        case 'submit':
+          this._handleSubmit(selector);
           break;
       }
     }
@@ -77,21 +77,6 @@ export default class GACodeGenerator {
       this._postProcessAddBlankLines()
     }
   }
-  _handleKeyDown (selector, value, keyCode) {
-    if(keyCode === 13){
-      // const previousBlock = this._blocks[
-      //     this._blocks.length-1
-      //   ];c
-      // if(this._blocks.length > 0 &&
-      //   previousBlock.getLines()[0].type === domEvents.CHANGE &&
-      //   previousBlock.getLines()[0].value.includes(selector)){
-      //   previousBlock.addLine({
-      //     type: domEvents.KEYDOWN,
-      //     value: `submit-form '${selector}'`
-      //   });
-      // }
-    }
-  }
   _handleClick (selector) {
     this._blocks.push(new Block(this._frameId, { type: domEvents.CLICK, value: `click '${selector}'` }));
   }
@@ -105,28 +90,13 @@ export default class GACodeGenerator {
   _handleGoto (href) {
     this._blocks.push(new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` }));
   }
-  _handleScreenshot (options) {
-    let block
-
-    if (options && options.x && options.y && options.width && options.height) {
-      // remove the tailing 'px'
-      for (let prop in options) {
-        if (options.hasOwnProperty(prop) && options[prop].slice(-2) === 'px') {
-          options[prop] = options[prop].substring(0, options[prop].length - 2)
-        }
-      }
-
-      block = new Block(this._frameId, {
-        type: pptrActions.SCREENSHOT,
-        value: `screenshot` })
-    } else {
-      block = new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot` })
-    }
-
+  _handleScreenshot (selector) {
+    this._blocks.push(new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot 'Imagem ${this._screenshotCounter}' ${selector}` }));
     this._screenshotCounter++
-    this._blocks.push(block);
   }
-
+  _handleSubmit (selector) {
+    this._blocks.push(new Block(this._frameId, { type: domEvents.SUBMIT, value: `submit-form '${selector}'` }))
+  }
   _postProcessAddBlankLines () {
     let i = 0
     while (i <= this._blocks.length) {
