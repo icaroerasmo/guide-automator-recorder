@@ -49,11 +49,14 @@ export default class GACodeGenerator {
           this._handleGoto(href, frameId);
           break;
         case pptrActions.SCREENSHOT:
-          this._handleScreenshot(selector);
+          this._handleScreenshot(value);
           break;
         case 'submit':
           this._handleSubmit(selector);
           break;
+        case pptrActions.VIEWPORT:
+          this._handleViewport(value.width, value.height);
+          break
       }
     }
 
@@ -90,12 +93,32 @@ export default class GACodeGenerator {
   _handleGoto (href) {
     this._blocks.push(new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` }));
   }
-  _handleScreenshot (selector) {
-    this._blocks.push(new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot 'Imagem ${this._screenshotCounter}' ${selector}` }));
+  _handleScreenshot (options) {
+    let block
+
+    if (options && options.x && options.y && options.width && options.height) {
+      // remove the tailing 'px'
+      for (let prop in options) {
+        if (options.hasOwnProperty(prop) && options[prop].slice(-2) === 'px') {
+          options[prop] = options[prop].substring(0, options[prop].length - 2)
+        }
+      }
+
+      block = new Block(this._frameId, {
+        type: pptrActions.SCREENSHOT,
+        value: `screenshot ${options.width} ${options.height} ${options.x} ${options.y} 'Image ${this._screenshotCounter}'` })
+    } else {
+      block = new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot 'Image ${this._screenshotCounter}'` })
+    }
+
     this._screenshotCounter++
+    this._blocks.push(block);
   }
   _handleSubmit (selector) {
     this._blocks.push(new Block(this._frameId, { type: domEvents.SUBMIT, value: `submit-form '${selector}'` }))
+  }
+  _handleViewport (width, height) {
+    this._blocks.push(new Block(this._frameId, { type: pptrActions.VIEWPORT, value: `viewport ${width} ${height}` }));
   }
   _postProcessAddBlankLines () {
     let i = 0
