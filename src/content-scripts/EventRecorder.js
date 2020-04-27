@@ -2,7 +2,7 @@ import eventsToRecord from '../code-generator/dom-events-to-record'
 import UIController from './UIController'
 import actions from '../models/extension-ui-actions'
 import ctrl from '../models/extension-control-messages'
-import finder from '@medv/finder'
+import utilities from '../util/Utilities'
 
 const DEFAULT_MOUSE_CURSOR = 'default'
 
@@ -59,13 +59,13 @@ export default class EventRecorder {
     if (msg && msg.action) {
       switch (msg.action) {
         case actions.TOGGLE_SCREENSHOT_MODE:
-          this._handleScreenshotMode(false)
+          this._handleScreenshotMode(false, false)
           break
         case actions.TOGGLE_SCREENSHOT_CLIPPED_MODE:
-          this._handleScreenshotMode(true)
+          this._handleScreenshotMode(true, false)
           break
         case actions.TOGGLE_SCREENSHOT_SELECTOR_MODE:
-          this._handleScreenshotMode(true);
+          this._handleScreenshotMode(true, true);
           break;
         default:
       }
@@ -103,11 +103,7 @@ export default class EventRecorder {
     // we explicitly catch any errors and swallow them, as none node-type events are also ingested.
     // for these events we cannot generate selectors, which is OK
     try {
-      const optimizedMinLength = (e.target.id) ? 2 : 10 // if the target has an id, use that instead of multiple other selectors
-      const selector = this._dataAttribute
-        ? finder(e.target, {seedMinLength: 5, optimizedMinLength: optimizedMinLength, attr: (name, _value) => name === this._dataAttribute})
-        : finder(e.target, {seedMinLength: 5, optimizedMinLength: optimizedMinLength})
-
+      const selector = utilities._findSelector(e);
       const msg = {
         selector: selector,
         value: e.target.value,
@@ -129,7 +125,7 @@ export default class EventRecorder {
     this._eventLog = []
   }
 
-  _handleScreenshotMode (isClipped) {
+  _handleScreenshotMode (isClipped, isSelector) {
     this._disableClickRecording()
     this._uiController = new UIController({ showSelector: isClipped })
     this._screenShotMode = !this._screenShotMode
@@ -146,7 +142,7 @@ export default class EventRecorder {
     this._uiController.on('click', event => {
       this._screenShotMode = false
       document.body.style.cursor = DEFAULT_MOUSE_CURSOR
-      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip })
+      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip, selector: isSelector ? event.selector : undefined })
       this._enableClickRecording()
     })
   }

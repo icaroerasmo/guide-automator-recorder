@@ -34,7 +34,6 @@ export default class GACodeGenerator {
 
     for (let i = 0; i < events.length; i++) {
       const { action, selector, value, href, tagName, frameId, frameUrl } = events[i]
-
       // we need to keep a handle on what frames events originate from
       this._setFrames(frameId, frameUrl)
 
@@ -49,7 +48,7 @@ export default class GACodeGenerator {
           this._handleGoto(href, frameId);
           break;
         case pptrActions.SCREENSHOT:
-          this._handleScreenshot(value);
+          this._handleScreenshot(value, selector);
           break;
         case 'submit':
           this._handleSubmit(selector);
@@ -93,10 +92,10 @@ export default class GACodeGenerator {
   _handleGoto (href) {
     this._blocks.push(new Block(this._frameId, { type: pptrActions.GOTO, value: `go-to-page '${href}'` }));
   }
-  _handleScreenshot (options) {
+  _handleScreenshot (options, selector) {
     let block
 
-    if (options && options.x && options.y && options.width && options.height) {
+    if (options && options.x && options.y && options.width && options.height && !selector) {
       // remove the tailing 'px'
       for (let prop in options) {
         if (options.hasOwnProperty(prop) && options[prop].slice(-2) === 'px') {
@@ -107,8 +106,10 @@ export default class GACodeGenerator {
       block = new Block(this._frameId, {
         type: pptrActions.SCREENSHOT,
         value: `screenshot ${options.width} ${options.height} ${options.x} ${options.y} 'Image ${this._screenshotCounter}'` })
-    } else {
+    } else if(!selector) {
       block = new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot 'Image ${this._screenshotCounter}'` })
+    } else {
+      block = new Block(this._frameId, { type: pptrActions.SCREENSHOT, value: `screenshot '${selector}' 'Image ${this._screenshotCounter}'` })
     }
 
     this._screenshotCounter++

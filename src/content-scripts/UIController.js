@@ -1,4 +1,5 @@
 import EventEmitter from 'events'
+import utilities from '../util/Utilities'
 
 const BORDER_THICKNESS = 3
 
@@ -100,8 +101,8 @@ class UIController extends EventEmitter {
           height: this._selector.style.height
         }
       }
-
-      this.emit('click', { clip, raw: e })
+      const selector = utilities._findSelector(e);
+      this.emit('click', { clip, raw: e , selector: selector})
     }, 100)
   }
 

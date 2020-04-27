@@ -167,8 +167,8 @@ class RecordingController {
     this.handleMessage({ selector: undefined, value: undefined, action: pptrActions.NAVIGATION })
   }
 
-  recordScreenshot (value) {
-    this.handleMessage({ selector: undefined, value, action: pptrActions.SCREENSHOT })
+  recordScreenshot (msg) {
+    this.handleMessage({ selector: msg.selector, value: msg.value, action: pptrActions.SCREENSHOT })
   }
 
   handleMessage (msg, sender) {
@@ -190,7 +190,7 @@ class RecordingController {
     if (msg.control === ctrl.EVENT_RECORDER_STARTED) chrome.browserAction.setBadgeText({ text: this._badgeState })
     if (msg.control === ctrl.GET_VIEWPORT_SIZE) this.recordCurrentViewportSize(msg.coordinates)
     if (msg.control === ctrl.GET_CURRENT_URL) this.recordCurrentUrl(msg.href)
-    if (msg.control === ctrl.GET_SCREENSHOT) this.recordScreenshot(msg.value)
+    if (msg.control === ctrl.GET_SCREENSHOT) this.recordScreenshot(msg)
   }
 
   handleNavigation ({ frameId }) {

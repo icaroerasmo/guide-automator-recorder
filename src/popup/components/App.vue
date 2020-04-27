@@ -12,9 +12,9 @@
         <a href="#" @click="toggleShowHelp" class="header-button">
           <img src="/images/help.svg" alt="help" width="18px">
         </a>
-        <a href="#" @click="openOptions" class="header-button">
+        <!-- <a href="#" @click="openOptions" class="header-button">
           <img src="/images/settings.svg" alt="settings" width="18px">
-        </a>
+        </a> -->
       </div>
     </div>
     <div class="main">
