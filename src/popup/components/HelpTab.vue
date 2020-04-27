@@ -18,7 +18,8 @@
       <h4>Keyboard shortcuts</h4>
       <ul>
         <li>Take screenshot: Ctrl+Shift+A</li>
-        <li>Take clipped screenshot: Ctrl+Shift+M</li>
+        <li>Take clipped screenshot: Ctrl+Shift+S</li>
+        <li>Take screenshot from selector: Ctrl+Shift+Y</li>
       </ul>
       <p>For more help and examples, <a href="https://checklyhq.com/puppeteer-recorder" target="_blank">go to the help docs</a></p>
       <h4>Replaying</h4>

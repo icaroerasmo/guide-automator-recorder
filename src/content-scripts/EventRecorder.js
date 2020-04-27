@@ -48,8 +48,8 @@ export default class EventRecorder {
 
     if (this._isTopFrame) {
       this._sendMessage({ control: ctrl.EVENT_RECORDER_STARTED })
-      this._sendMessage({ control: ctrl.GET_CURRENT_URL, href: window.location.href })
       this._sendMessage({ control: ctrl.GET_VIEWPORT_SIZE, coordinates: { width: window.innerWidth, height: window.innerHeight } })
+      this._sendMessage({ control: ctrl.GET_CURRENT_URL, href: window.location.href })
       console.debug('Puppeteer Recorder in-page EventRecorder started')
     }
   }
@@ -64,6 +64,9 @@ export default class EventRecorder {
         case actions.TOGGLE_SCREENSHOT_CLIPPED_MODE:
           this._handleScreenshotMode(true)
           break
+        case actions.TOGGLE_SCREENSHOT_SELECTOR_MODE:
+          this._handleScreenshotMode(true);
+          break;
         default:
       }
     }
@@ -143,7 +146,7 @@ export default class EventRecorder {
     this._uiController.on('click', event => {
       this._screenShotMode = false
       document.body.style.cursor = DEFAULT_MOUSE_CURSOR
-      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip })
+      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip, selector: this._screenshotSelector })
       this._enableClickRecording()
     })
   }
