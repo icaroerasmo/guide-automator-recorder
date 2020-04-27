@@ -146,7 +146,7 @@ export default class EventRecorder {
     this._uiController.on('click', event => {
       this._screenShotMode = false
       document.body.style.cursor = DEFAULT_MOUSE_CURSOR
-      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip, selector: this._screenshotSelector })
+      this._sendMessage({ control: ctrl.GET_SCREENSHOT, value: event.clip })
       this._enableClickRecording()
     })
   }
