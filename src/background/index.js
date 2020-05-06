@@ -21,7 +21,6 @@ class RecordingController {
     this._menuId = 'PUPPETEER_RECORDER_CONTEXT_MENU'
     this._menuOptions = {
       SCREENSHOT: 'SCREENSHOT',
-      SCREENSHOT_CLIPPED: 'SCREENSHOT_CLIPPED',
       SCREENSHOT_SELECTOR: 'SCREENSHOT_SELECTOR'
     }
   }
@@ -78,13 +77,6 @@ class RecordingController {
       chrome.contextMenus.create({
         id: this._menuId + this._menuOptions.SCREENSHOT,
         title: 'Take Screenshot (Ctrl+Shift+A)',
-        parentId: this._menuId,
-        contexts: ['all']
-      })
-
-      chrome.contextMenus.create({
-        id: this._menuId + this._menuOptions.SCREENSHOT_CLIPPED,
-        title: 'Take Screenshot Clipped (Ctrl+Shift+S)',
         parentId: this._menuId,
         contexts: ['all']
       })
@@ -207,9 +199,6 @@ class RecordingController {
       case (this._menuId + this._menuOptions.SCREENSHOT):
         this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_MODE)
         break
-      case (this._menuId + this._menuOptions.SCREENSHOT_CLIPPED):
-        this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_CLIPPED_MODE)
-        break
       case (this._menuId + this._menuOptions.SCREENSHOT_SELECTOR):
         this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_SELECTOR_MODE)
         break
@@ -220,9 +209,6 @@ class RecordingController {
     switch (command) {
       case actions.TOGGLE_SCREENSHOT_MODE:
         this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_MODE)
-        break
-      case actions.TOGGLE_SCREENSHOT_CLIPPED_MODE:
-        this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_CLIPPED_MODE)
         break
       case actions.TOGGLE_SCREENSHOT_SELECTOR_MODE:
         this.toggleScreenShotMode(actions.TOGGLE_SCREENSHOT_SELECTOR_MODE)

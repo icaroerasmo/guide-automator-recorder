@@ -28,13 +28,6 @@
       },
       "description": "Take screenshot"
     },
-    "TOGGLE_SCREENSHOT_CLIPPED_MODE": {
-      "suggested_key": {
-        "default": "Ctrl+Shift+S",
-        "mac": "Command+Shift+S"
-      },
-      "description": "Take screenshot clipped"
-    },
     "TOGGLE_SCREENSHOT_SELECTOR_MODE": {
       "suggested_key": {
         "default": "Ctrl+Shift+Y",

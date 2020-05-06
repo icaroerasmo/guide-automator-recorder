@@ -61,9 +61,6 @@ export default class EventRecorder {
         case actions.TOGGLE_SCREENSHOT_MODE:
           this._handleScreenshotMode(false, false)
           break
-        case actions.TOGGLE_SCREENSHOT_CLIPPED_MODE:
-          this._handleScreenshotMode(true, false)
-          break
         case actions.TOGGLE_SCREENSHOT_SELECTOR_MODE:
           this._handleScreenshotMode(true, true);
           break;
